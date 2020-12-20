@@ -1,0 +1,34 @@
+---
+- name: "T01 A. --> {{ ansible_distribution_file_variety }}: Install required system packages"
+  apt: update_cache=yes force_apt_get=yes cache_valid_time=3600 name={{ item }} state=latest
+  loop: [ 'php', 'libapache2-mod-php', 'apache2', 'mysql-server', 'python3-pymysql', 'php-curl', 'php-json', 'php-mbstring', 'php-xml', 'php-mysql']
+  when: ansible_distribution_file_variety == "Debian"
+
+- name: "T02 A. --> {{ ansible_distribution_file_variety }}: Download rpm mysql"
+  get_url:
+      url: https://dev.mysql.com/get/mysql80-community-release-el7-3.noarch.rpm
+      dest: /root
+  when: ansible_distribution_file_variety == "RedHat"
+
+  #- name: "T02 B. --> {{ ansible_distribution_file_variety }}: Run configuration command to fiewall"  
+  #  command: sudo rpm -Uvh mysql80-community-release-el7-3.noarch.rpm
+  #  when: ansible_distribution_file_variety == "RedHat"
+- name: "T02 B.1. --> {{ ansible_distribution_file_variety }}: Run configuration command to fiewall"
+  command: sudo firewall-cmd --permanent --add-service=http
+  when: ansible_distribution_file_variety == "RedHat"
+- name: "T02 B.2. --> {{ ansible_distribution_file_variety }}: Run configuration command to fiewall"  
+  command: sudo firewall-cmd --permanent --add-service=https
+  when: ansible_distribution_file_variety == "RedHat"
+- name: "T02 B.3. --> {{ ansible_distribution_file_variety }}: Run configuration command to fiewall"  
+  command: sudo firewall-cmd --reload
+  when: ansible_distribution_file_variety == "RedHat"
+
+- name: "T02 C. --> {{ ansible_distribution_file_variety }}: Install required system packages"     
+  yum: update_cache=yes name={{ item }} state=latest
+  loop: [ 'yum-utils', 'epel-release', 'python-pip', 'php', 'httpd', 'httpd-devel', 'mysql-server', 'php-curl', 'php-json', 'php-mbstring', 'php-xml', 'php-mysql']
+  when: ansible_distribution_file_variety == "RedHat"
+
+- name: "T02 D. --> {{ ansible_distribution_file_variety }}: Install pysql in other distribution"
+  pip:
+    name: pymysql
+  when: ansible_distribution_file_variety == "RedHat"  

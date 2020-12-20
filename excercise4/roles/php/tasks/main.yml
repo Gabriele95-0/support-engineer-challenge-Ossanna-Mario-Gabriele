@@ -1,0 +1,12 @@
+---
+- name: "T01 A. --> {{ ansible_distribution_file_variety }}: Install required system packages"
+  apt: update_cache=yes force_apt_get=yes cache_valid_time=3600 name={{ item }} state=latest
+  loop: [ 'php-gd']
+  when: ansible_distribution_file_variety == "Debian"
+
+
+- name: "T01 B. --> {{ ansible_distribution_file_variety }}: Install required system packages"
+  yum: update_cache=yes name={{ item }} state=latest
+  loop: [ 'php-gd']
+  when: ansible_distribution_file_variety == "RedHat"
+
