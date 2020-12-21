@@ -37,5 +37,13 @@ Cron string:
 ```
 
 ## Excercise 4
+For this exercise I decided to use ansible because in my opinion it's an excellent software for automating the configuration and management procedures on unix-like and Windows systems and I think it also works very well. I wrote ansible playbooks so that wordpress can be configured on multiple distributions (in this case Ubuntu20.04 and CentOS-7).
+I used Parallels Desktop as software to create VMs.
 
+First of all I installed and configured ansible on a CentOS-8 VM (master VM), then I created an Ubuntu20.04-server VM and a CentOS-7 VM on which I will go to install and configure WordPress.
+As a second step I created a small project that goes to "ansibleizzare" remote servers by sharing the public ssh key of the master VM and creating an ansible user.
+Finally I created the scripts for the complete WordPress installation and setup.
+
+I saw some problems with the different mysql configurations in the two distributions and also CentOS-7 by default installs PHP54 but the latest version of WordPress needs PHP56 so I tried to get around the problem as best I could and installed PHP56 on CentOS-7.
+The code works, but it could be improved!
 

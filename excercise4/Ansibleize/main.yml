@@ -1,0 +1,54 @@
+---
+- hosts: all
+  gather_facts: True
+  become: true
+  vars:
+    sudoGroup: "{{ 'sudo' if ansible_distribution == 'Ubuntu' or ansible_distribution == 'Debian'  or ansible_distribution == 'OtherLinux' else 'wheel' }}"
+
+  tasks:
+  - name: Copy rpm file for architecture {{ ansible_architecture }} and version {{ ansible_distribution_major_version }}
+    copy:
+      src: "{{ item }}"
+      dest: "/tmp/"
+      owner: "root"
+      group: "root"
+      mode: 0644
+      backup: no
+    with_fileglob: "rpm/{{ ansible_architecture }}/{{ ansible_distribution_major_version }}/*.rpm"
+
+  - name: PKG Install for specific Distro
+    shell: for i in `ls /tmp/*.{{ ansible_architecture }}.rpm`;do rpm -Uvh $i;done;
+    ignore_errors: yes
+
+  - name: Clean Section
+    shell: rm -f /tmp/*.{{ ansible_architecture }}.rpm
+    args:
+      warn: false
+
+  - name: create group ansible
+    group:
+     name: ansible
+     gid: 1809
+     state: present
+  - name: create user ansible
+    user:
+     name: ansible
+     uid: 1899
+     group: ansible
+     #groups: ssh-users
+     shell: /bin/bash
+     state: present
+     expires: -1
+  - name: copy public key for user ansible
+    authorized_key:
+     user: ansible
+     key: "{{ lookup('file', 'files/ansiblePRL_id_rsa.pub') }}"
+  - name: sudoers rule for user ansible
+    blockinfile:
+     dest: /etc/sudoers
+     state: present
+     block: |
+             Defaults:ansible !requiretty
+             ansible ALL=(ALL) NOPASSWD: ALL
+     validate: '/usr/sbin/visudo -cf %s'
+     backup: yes

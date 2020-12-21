@@ -1,11 +1,22 @@
 ---
-- name: Create mysql database
+- name: "T01 A. --> {{ ansible_distribution_file_variety }}: Create mysql database"
   mysql_db: 
     name: "{{ wp_mysql_db }}" 
     state: present
     login_unix_socket: /var/run/mysqld/mysqld.sock
+  when: ansible_distribution_file_variety == "Debian"
 
-- name: "T01 A. --> {{ ansible_distribution_file_variety }}: Create mysql user"
+- name: "T01 B. --> {{ ansible_distribution_file_variety }}: Create mysql database"
+  mysql_db:
+    login_user: root
+    login_password: Ciccio123@ 
+    name: "{{ wp_mysql_db }}"
+    state: present
+#    login_unix_socket: /var/lib/mysql/mysql.sock
+  when: ansible_distribution_file_variety == "RedHat"
+
+
+- name: "T02 A. --> {{ ansible_distribution_file_variety }}: Create mysql user"
   mysql_user:
     login_user: debian-sys-maint 
     login_password: AzCaYWD8BNHlkFls
@@ -14,10 +25,10 @@
     priv: '*.*:ALL'
   when: ansible_distribution_file_variety == "Debian"
 
-- name: "T01 B. --> {{ ansible_distribution_file_variety }}: Create mysql user"
+- name: "T02 B. --> {{ ansible_distribution_file_variety }}: Create mysql user"
   mysql_user:
     login_user: root
-    login_password: Sk,g)&_i6(hK
+    login_password: Ciccio123@
     name: "{{ wp_mysql_user }}"
     password: "{{ wp_mysql_password }}"
     priv: '*.*:ALL'

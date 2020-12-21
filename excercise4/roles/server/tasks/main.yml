@@ -6,13 +6,13 @@
 
 - name: "T02 A. --> {{ ansible_distribution_file_variety }}: Download rpm mysql"
   get_url:
-      url: https://dev.mysql.com/get/mysql80-community-release-el7-3.noarch.rpm
+      url: https://dev.mysql.com/get/mysql57-community-release-el7-9.noarch.rpm
       dest: /root
   when: ansible_distribution_file_variety == "RedHat"
 
-  #- name: "T02 B. --> {{ ansible_distribution_file_variety }}: Run configuration command to fiewall"  
-  #  command: sudo rpm -Uvh mysql80-community-release-el7-3.noarch.rpm
-  #  when: ansible_distribution_file_variety == "RedHat"
+- name: "T02 B. --> {{ ansible_distribution_file_variety }}: Install mysql57"  
+  command: sudo rpm -ivh mysql57-community-release-el7-9.noarch.rpm
+  when: ansible_distribution_file_variety == "RedHat"
 - name: "T02 B.1. --> {{ ansible_distribution_file_variety }}: Run configuration command to fiewall"
   command: sudo firewall-cmd --permanent --add-service=http
   when: ansible_distribution_file_variety == "RedHat"
@@ -23,6 +23,19 @@
   command: sudo firewall-cmd --reload
   when: ansible_distribution_file_variety == "RedHat"
 
+- name: "T03 A. --> {{ ansible_distribution_file_variety }}: Install required system packages to get php56"
+  yum: update_cache=yes name={{ item }} state=latest
+  loop: [ 'epel-release', 'yum-utils']
+  when: ansible_distribution_file_variety == "RedHat"
+  
+- name: "T03 A.1. --> {{ ansible_distribution_file_variety }}: Install required system packages to get php56"
+  command: yum install http://rpms.remirepo.net/enterprise/remi-release-7.rpm
+  when: ansible_distribution_file_variety == "RedHat"
+
+- name: "T03 B. --> {{ ansible_distribution_file_variety }}: Install required system packages to get php56"
+  command: yum-config-manager --enable remi-php56
+  when: ansible_distribution_file_variety == "RedHat"
+
 - name: "T02 C. --> {{ ansible_distribution_file_variety }}: Install required system packages"     
   yum: update_cache=yes name={{ item }} state=latest
   loop: [ 'yum-utils', 'epel-release', 'python-pip', 'php', 'httpd', 'httpd-devel', 'mysql-server', 'php-curl', 'php-json', 'php-mbstring', 'php-xml', 'php-mysql']
@@ -31,4 +44,9 @@
 - name: "T02 D. --> {{ ansible_distribution_file_variety }}: Install pysql in other distribution"
   pip:
     name: pymysql
-  when: ansible_distribution_file_variety == "RedHat"  
+  when: ansible_distribution_file_variety == "RedHat" 
+
+- name: "{{ ansible_distribution_file_variety }}: Start MySQL"
+  service: name=mysqld state=started
+  when: ansible_distribution_file_variety == "RedHat"
+   
