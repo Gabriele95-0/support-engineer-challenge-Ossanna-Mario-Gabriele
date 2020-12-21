@@ -38,7 +38,7 @@
 
 - name: "T02 C. --> {{ ansible_distribution_file_variety }}: Install required system packages"     
   yum: update_cache=yes name={{ item }} state=latest
-  loop: [ 'yum-utils', 'epel-release', 'python-pip', 'php', 'httpd', 'httpd-devel', 'mysql-server', 'php-curl', 'php-json', 'php-mbstring', 'php-xml', 'php-mysql']
+  loop: [ 'python-pip', 'php', 'httpd', 'httpd-devel', 'mysql-server', 'php-curl', 'php-json', 'php-mbstring', 'php-xml', 'php-mysql']
   when: ansible_distribution_file_variety == "RedHat"
 
 - name: "T02 D. --> {{ ansible_distribution_file_variety }}: Install pysql in other distribution"
